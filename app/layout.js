@@ -39,6 +39,10 @@ export const metadata = {
     "geo.placename": "La Réunion",
     language: "fr-FR",
   },
+  icons: {
+    icon: [{ url: "/logo.png", type: "image/png" }],
+    apple: [{ url: "/logo.png" }],
+  },
 };
 
 export const viewport = {

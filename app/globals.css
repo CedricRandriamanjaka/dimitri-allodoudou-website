@@ -54,13 +54,29 @@ button { cursor: pointer; }
 
 .brand-mark {
   display: inline-flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
   line-height: .78;
   text-decoration: none;
   font-family: "Playfair Display", Georgia, serif;
   font-weight: 700;
   font-size: 28px;
   letter-spacing: -.045em;
+}
+
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  background: transparent;
+  flex: 0 0 auto;
+  display: block;
+}
+
+.brand-text {
+  display: inline-flex;
+  flex-direction: column;
 }
 
 .brand-allo { color: var(--accent); }
@@ -470,10 +486,26 @@ h1 span {
 footer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 18px;
   padding: 26px 0 32px;
   color: rgba(240,213,190,.38);
   font-size: 11px;
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  background: transparent;
+  flex: 0 0 auto;
+  display: block;
 }
 
 footer p { margin: 0; }

@@ -28,8 +28,17 @@ export default function HomePage() {
       <div className="page-shell">
         <Reveal as="header" className="brand" aria-label="Allo Doudou">
           <a className="brand-mark" href="#top" aria-label="Allo Doudou">
-            <span className="brand-allo">Allo</span>
-            <span className="brand-doudou">Doudou</span>
+            <img
+              className="brand-logo"
+              src="/logo.png"
+              alt=""
+              width={44}
+              height={44}
+            />
+            <span className="brand-text">
+              <span className="brand-allo">Allo</span>
+              <span className="brand-doudou">Doudou</span>
+            </span>
           </a>
 
           <span className="brand-note">
@@ -79,7 +88,16 @@ export default function HomePage() {
         </main>
 
         <Reveal as="footer" delay={80}>
-          <p>© {new Date().getFullYear()} Allo Doudou</p>
+          <div className="footer-brand">
+            <img
+              className="footer-logo"
+              src="/logo.png"
+              alt=""
+              width={28}
+              height={28}
+            />
+            <p>© {new Date().getFullYear()} Allo Doudou</p>
+          </div>
           <p>La Réunion · Le lancement approche.</p>
         </Reveal>
       </div>
