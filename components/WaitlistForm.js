@@ -7,9 +7,23 @@ export default function WaitlistForm() {
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [challenge, setChallenge] = useState("");
+
+  async function refreshChallenge() {
+    try {
+      const response = await fetch("/api/waitlist/challenge", {
+        cache: "no-store",
+      });
+      const data = await response.json();
+      if (data?.challenge) setChallenge(data.challenge);
+    } catch {
+      setChallenge("");
+    }
+  }
 
   useEffect(() => {
     setMounted(true);
+    refreshChallenge();
   }, []);
 
   useEffect(() => {
@@ -45,6 +59,16 @@ export default function WaitlistForm() {
       return;
     }
 
+    if (!challenge) {
+      setModal({
+        type: "error",
+        title: "Sécurité",
+        message: "Chargement anti-spam en cours. Réessayez dans un instant.",
+      });
+      refreshChallenge();
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -55,6 +79,7 @@ export default function WaitlistForm() {
           email,
           source: "coming-soon-la-reunion",
           website,
+          challenge,
         }),
       });
 
@@ -80,6 +105,7 @@ export default function WaitlistForm() {
       });
     } finally {
       setLoading(false);
+      refreshChallenge();
     }
   }
 

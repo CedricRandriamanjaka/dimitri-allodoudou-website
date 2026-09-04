@@ -1,6 +1,10 @@
 import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import {
+  isAllowedOrigin,
+  verifyChallenge,
+} from "@/lib/waitlist-security";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_INTERVAL_MS = 60_000;
@@ -30,7 +34,9 @@ function checkMemoryRateLimit(key) {
   const times = (attemptBuckets.get(key) || []).filter((t) => now - t < HOUR_MS);
 
   if (times.length > 0 && now - times[times.length - 1] < MIN_INTERVAL_MS) {
-    const waitSec = Math.ceil((MIN_INTERVAL_MS - (now - times[times.length - 1])) / 1000);
+    const waitSec = Math.ceil(
+      (MIN_INTERVAL_MS - (now - times[times.length - 1])) / 1000
+    );
     return {
       ok: false,
       error: `Attendez ${waitSec} s avant un nouvel essai.`,
@@ -88,6 +94,10 @@ async function checkDbRateLimit(supabase, ipHash) {
 
 export async function POST(request) {
   try {
+    if (!isAllowedOrigin(request)) {
+      return NextResponse.json({ error: "Origine non autorisée." }, { status: 403 });
+    }
+
     const contentLength = Number(request.headers.get("content-length") || 0);
     if (contentLength > 20_000) {
       return NextResponse.json({ error: "Requête invalide." }, { status: 413 });
@@ -98,10 +108,20 @@ export async function POST(request) {
       email,
       source = "coming-soon-la-reunion",
       website = "",
+      challenge = "",
     } = body || {};
 
+    // Honeypot : bots qui remplissent les champs cachés
     if (website) {
       return NextResponse.json({ ok: true });
+    }
+
+    const challengeCheck = verifyChallenge(challenge);
+    if (!challengeCheck.ok) {
+      return NextResponse.json(
+        { error: "Vérification anti-spam échouée. Rechargez la page et réessayez." },
+        { status: 403 }
+      );
     }
 
     if (
