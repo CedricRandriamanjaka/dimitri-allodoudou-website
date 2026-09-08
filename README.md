@@ -66,7 +66,7 @@ Le formulaire utilise **Cloudflare Turnstile**. Il fonctionne même si le site e
 4. Ajoute le domaine Netlify, par exemple :
 
 ```text
-allo-doudou.netlify.app
+peemente.netlify.app
 ```
 
 5. Après achat du domaine final, ajoute aussi ce domaine au widget.
@@ -77,7 +77,7 @@ Sur Netlify, tu utiliseras :
 ```env
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=TA_VRAIE_SITE_KEY
 TURNSTILE_SECRET_KEY=TA_VRAIE_SECRET_KEY
-TURNSTILE_ALLOWED_HOSTNAMES=allo-doudou.netlify.app,www.tondomaine.re,tondomaine.re
+TURNSTILE_ALLOWED_HOSTNAMES=peemente.netlify.app,www.tondomaine.re,tondomaine.re
 ```
 
 Ne mets pas les clés de test Cloudflare en production.
@@ -107,12 +107,12 @@ Dans :
 ajoute :
 
 ```env
-NEXT_PUBLIC_SITE_URL=https://allo-doudou.netlify.app
+NEXT_PUBLIC_SITE_URL=https://peemente.netlify.app
 SUPABASE_URL=https://xxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=xxxx
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=xxxx
 TURNSTILE_SECRET_KEY=xxxx
-TURNSTILE_ALLOWED_HOSTNAMES=allo-doudou.netlify.app
+TURNSTILE_ALLOWED_HOSTNAMES=peemente.netlify.app
 ```
 
 Puis redéploie le site.

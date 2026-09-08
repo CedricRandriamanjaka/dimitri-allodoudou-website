@@ -1,6 +1,6 @@
 export default function sitemap() {
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://www.votredomaine.re";
+    process.env.NEXT_PUBLIC_SITE_URL || "https://peemente.netlify.app";
 
   return [
     {
