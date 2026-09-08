@@ -1,10 +1,12 @@
 import "./globals.css";
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.votredomaine.re"),
-  title: "Allo Doudou La Réunion — Expérience vocale privée bientôt disponible",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://peemente.re"
+  ),
+  title: "PEEMENTE — Rencontres libertines 100% Péi",
   description:
-    "Allo Doudou arrive bientôt à La Réunion. Une expérience vocale privée, 100% audio, sans caméra et pensée pour rester discrète. Inscrivez-vous pour être prévenu du lancement.",
+    "PEEMENTE, le 1er réseau social libertin à La Réunion. Couples et célibataires libres, intentions claires, discrétion max. Inscris-toi pour le lancement.",
   robots: {
     index: true,
     follow: true,
@@ -22,17 +24,17 @@ export const metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    siteName: "Allo Doudou",
-    title: "Allo Doudou La Réunion — Bientôt",
+    siteName: "PEEMENTE",
+    title: "PEEMENTE — Rencontres libertines 100% Péi",
     description:
-      "Une expérience vocale privée, 100% audio et sans caméra, bientôt disponible à La Réunion.",
+      "Couples et célibataires libres à La Réunion. Intentions claires, discrétion max. Bientôt.",
     url: "/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Allo Doudou La Réunion — Bientôt",
+    title: "PEEMENTE — Rencontres libertines 100% Péi",
     description:
-      "Une expérience vocale privée, 100% audio et sans caméra, bientôt disponible à La Réunion.",
+      "Couples et célibataires libres à La Réunion. Intentions claires, discrétion max. Bientôt.",
   },
   other: {
     "geo.region": "FR-RE",
@@ -46,7 +48,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: "#3D1F5C",
+  themeColor: "#0B0706",
   width: "device-width",
   initialScale: 1,
 };
@@ -54,6 +56,18 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="fr">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

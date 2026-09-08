@@ -8,14 +8,14 @@ export default function IntroCurtain() {
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const seen = window.sessionStorage.getItem("allo-doudou-intro-seen");
+    const seen = window.sessionStorage.getItem("peemente-intro-seen");
     if (reduced || seen) return;
 
     setVisible(true);
-    window.sessionStorage.setItem("allo-doudou-intro-seen", "1");
+    window.sessionStorage.setItem("peemente-intro-seen", "1");
 
-    const leaveTimer = window.setTimeout(() => setLeaving(true), 900);
-    const hideTimer = window.setTimeout(() => setVisible(false), 1450);
+    const leaveTimer = window.setTimeout(() => setLeaving(true), 1100);
+    const hideTimer = window.setTimeout(() => setVisible(false), 1650);
     return () => {
       window.clearTimeout(leaveTimer);
       window.clearTimeout(hideTimer);
@@ -26,12 +26,12 @@ export default function IntroCurtain() {
 
   return (
     <div className={`intro-curtain ${leaving ? "is-leaving" : ""}`} aria-hidden="true">
+      <img className="intro-mark" src="/logo.png" alt="" width={88} height={88} />
       <div className="intro-logo">
-        <span>Allo</span>
-        <strong>Doudou</strong>
+        <strong>PEEMENTE</strong>
       </div>
       <div className="intro-line" />
-      <small>La Réunion · bientôt</small>
+      <small>100% Péi · bientôt</small>
     </div>
   );
 }

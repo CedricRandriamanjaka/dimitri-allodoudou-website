@@ -28,14 +28,11 @@ export default function WaitlistForm() {
 
   useEffect(() => {
     if (!modal) return;
-
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
     function onKey(event) {
       if (event.key === "Escape") setModal(null);
     }
-
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prevOverflow;
@@ -49,6 +46,7 @@ export default function WaitlistForm() {
     const formData = new FormData(form);
     const email = formData.get("email")?.toString().trim();
     const website = formData.get("website")?.toString() || "";
+    const wantsSurvey = formData.get("wantsSurvey") === "on";
 
     if (!email) {
       setModal({
@@ -77,31 +75,33 @@ export default function WaitlistForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          source: "coming-soon-la-reunion",
+          source: "peemente-coming-soon",
           website,
           challenge,
+          wantsSurvey,
         }),
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data?.error || "Une erreur est survenue.");
       }
 
       setModal({
         type: "success",
-        title: data?.alreadyRegistered ? "Déjà inscrit" : "Inscription réussie",
+        title: data?.alreadyRegistered ? "Déjà inscrit" : "Bienvenu·e dans le feu",
         message: data?.alreadyRegistered
-          ? "Cet email est déjà inscrit. On ne vous oublie pas."
-          : "C’est noté. On vous préviendra au lancement.",
+          ? "Cet email est déjà inscrit. On ne t’oublie pas."
+          : wantsSurvey
+            ? "C’est noté. On te prévient au lancement et on pourra t’envoyer le questionnaire."
+            : "C’est noté. Tu seras prévenu·e dès le lancement.",
       });
       form.reset();
     } catch (error) {
       setModal({
         type: "error",
         title: "Échec de l’inscription",
-        message: error.message || "Impossible de vous inscrire pour le moment.",
+        message: error.message || "Impossible de t’inscrire pour le moment.",
       });
     } finally {
       setLoading(false);
@@ -140,18 +140,18 @@ export default function WaitlistForm() {
 
   return (
     <>
-      <form className="waitlist" onSubmit={handleSubmit} noValidate>
+      <form className="waitlist waitlist-hero" onSubmit={handleSubmit} noValidate>
         <div className="waitlist-heading">
           <div>
-            <strong>Soyez prévenu au lancement</strong>
-            <span>
-              Nous vous écrirons dès qu’Allo Doudou sera disponible à La Réunion.
-            </span>
+            <strong>Réserve ta place maintenant</strong>
+            <span>Accès prioritaire pour les premiers inscrits.</span>
           </div>
-          <span className="mail-symbol" aria-hidden="true">✦</span>
+          <span className="waitlist-badge">Ouverture bientôt</span>
         </div>
 
-        <label className="sr-only" htmlFor="email">Votre adresse email</label>
+        <label className="sr-only" htmlFor="email">
+          Votre adresse email
+        </label>
 
         <div className="form-row">
           <input
@@ -160,15 +160,22 @@ export default function WaitlistForm() {
             type="email"
             autoComplete="email"
             inputMode="email"
-            placeholder="votre@email.com"
+            placeholder="ton@email.com"
             required
             maxLength={254}
           />
           <button type="submit" disabled={loading}>
-            {loading ? "Envoi..." : "Me prévenir"}
+            {loading ? "Envoi..." : "Je m’inscris"}
             <span aria-hidden="true">→</span>
           </button>
         </div>
+
+        <label className="form-optin" htmlFor="wantsSurvey">
+          <input id="wantsSurvey" name="wantsSurvey" type="checkbox" defaultChecked />
+          <span>
+            Oui, vous pouvez m’envoyer un questionnaire par email plus tard.
+          </span>
+        </label>
 
         <div className="hp-field" aria-hidden="true">
           <label htmlFor="website">Votre site web</label>
@@ -181,8 +188,12 @@ export default function WaitlistForm() {
           />
         </div>
 
-        <div className="form-meta">
-          <p className="form-privacy">Un seul email au lancement. Pas de spam.</p>
+        <div className="form-trust" aria-label="Engagements">
+          <span>100% discret</span>
+          <i aria-hidden="true" />
+          <span>Sans spam</span>
+          <i aria-hidden="true" />
+          <span>100% Péi</span>
         </div>
       </form>
 

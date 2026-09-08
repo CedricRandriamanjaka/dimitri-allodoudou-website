@@ -106,9 +106,10 @@ export async function POST(request) {
     const body = await request.json();
     const {
       email,
-      source = "coming-soon-la-reunion",
+      source = "peemente-coming-soon",
       website = "",
       challenge = "",
+      wantsSurvey = false,
     } = body || {};
 
     // Honeypot : bots qui remplissent les champs cachés
@@ -167,10 +168,11 @@ export async function POST(request) {
 
     const normalizedEmail = email.trim().toLowerCase();
     const safeSource = String(source).slice(0, 80);
+    const surveyOptIn = Boolean(wantsSurvey);
 
     const { data: existing, error: existingError } = await supabase
       .from("waitlist")
-      .select("id")
+      .select("id, wants_survey")
       .eq("email", normalizedEmail)
       .maybeSingle();
 
@@ -183,6 +185,12 @@ export async function POST(request) {
     }
 
     if (existing) {
+      if (surveyOptIn && !existing.wants_survey) {
+        await supabase
+          .from("waitlist")
+          .update({ wants_survey: true })
+          .eq("id", existing.id);
+      }
       return NextResponse.json({ ok: true, alreadyRegistered: true });
     }
 
@@ -190,6 +198,7 @@ export async function POST(request) {
       email: normalizedEmail,
       source: safeSource,
       ip_hash: ipHash === "unknown" ? null : ipHash,
+      wants_survey: surveyOptIn,
     });
 
     if (error) {
