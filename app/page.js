@@ -34,7 +34,7 @@ export default function HomePage() {
       <div className="shell">
         <header className="topbar anim-in" style={{ "--d": "0ms" }}>
           <a className="logo" href="#top" aria-label="PEEMENTE">
-            <img src="/logo.png" alt="" width={40} height={40} />
+            <img src="/logo.png" alt="" width={48} height={48} />
             <span>PEEMENTE</span>
           </a>
           <span className="top-chip">Bientôt</span>

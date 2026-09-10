@@ -36,7 +36,7 @@ export default function IntroCurtain() {
 
   return (
     <div className={`intro-curtain ${leaving ? "is-leaving" : ""}`} aria-hidden="true">
-      <img className="intro-mark" src="/logo.png" alt="" width={88} height={88} />
+      <img className="intro-mark" src="/logo.png" alt="" width={104} height={104} />
       <div className="intro-logo">PEEMENTE</div>
       <div className="intro-line" />
       <small>100% Péi · bientôt</small>
