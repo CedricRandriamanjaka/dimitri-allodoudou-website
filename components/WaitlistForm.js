@@ -89,12 +89,12 @@ export default function WaitlistForm() {
 
       setModal({
         type: "success",
-        title: data?.alreadyRegistered ? "Déjà inscrit" : "Bienvenu·e dans le feu",
+        title: data?.alreadyRegistered ? "Déjà inscrit" : "C’est noté",
         message: data?.alreadyRegistered
           ? "Cet email est déjà inscrit. On ne t’oublie pas."
           : wantsSurvey
-            ? "C’est noté. On te prévient au lancement et on pourra t’envoyer le questionnaire."
-            : "C’est noté. Tu seras prévenu·e dès le lancement.",
+            ? "On te prévient au lancement et on pourra t’envoyer le questionnaire."
+            : "Tu seras prévenu·e dès le lancement.",
       });
       form.reset();
     } catch (error) {
@@ -124,9 +124,6 @@ export default function WaitlistForm() {
               aria-labelledby="waitlist-modal-title"
               onClick={(event) => event.stopPropagation()}
             >
-              <p className="waitlist-modal-kicker" aria-hidden="true">
-                {modal.type === "success" ? "✓" : "!"}
-              </p>
               <h2 id="waitlist-modal-title">{modal.title}</h2>
               <p>{modal.message}</p>
               <button type="button" onClick={() => setModal(null)}>
@@ -140,15 +137,7 @@ export default function WaitlistForm() {
 
   return (
     <>
-      <form className="waitlist waitlist-hero" onSubmit={handleSubmit} noValidate>
-        <div className="waitlist-heading">
-          <div>
-            <strong>Réserve ta place maintenant</strong>
-            <span>Accès prioritaire pour les premiers inscrits.</span>
-          </div>
-          <span className="waitlist-badge">Ouverture bientôt</span>
-        </div>
-
+      <form className="waitlist" onSubmit={handleSubmit} noValidate>
         <label className="sr-only" htmlFor="email">
           Votre adresse email
         </label>
@@ -165,16 +154,13 @@ export default function WaitlistForm() {
             maxLength={254}
           />
           <button type="submit" disabled={loading}>
-            {loading ? "Envoi..." : "Je m’inscris"}
-            <span aria-hidden="true">→</span>
+            {loading ? "Envoi..." : "Créer mon compte"}
           </button>
         </div>
 
         <label className="form-optin" htmlFor="wantsSurvey">
           <input id="wantsSurvey" name="wantsSurvey" type="checkbox" defaultChecked />
-          <span>
-            Oui, vous pouvez m’envoyer un questionnaire par email plus tard.
-          </span>
+          <span>Oui, vous pouvez m’envoyer un questionnaire plus tard.</span>
         </label>
 
         <div className="hp-field" aria-hidden="true">
@@ -186,14 +172,6 @@ export default function WaitlistForm() {
             tabIndex={-1}
             autoComplete="off"
           />
-        </div>
-
-        <div className="form-trust" aria-label="Engagements">
-          <span>100% discret</span>
-          <i aria-hidden="true" />
-          <span>Sans spam</span>
-          <i aria-hidden="true" />
-          <span>100% Péi</span>
         </div>
       </form>
 

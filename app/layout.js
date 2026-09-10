@@ -48,15 +48,20 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: "#0B0706",
+  themeColor: "#FFEDDD",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var r=window.matchMedia("(prefers-reduced-motion: reduce)").matches;var s=sessionStorage.getItem("peemente-intro-seen");document.documentElement.classList.add(r||s?"intro-skip":"intro-pending");}catch(e){document.documentElement.classList.add("intro-pending");}})();`,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -64,7 +69,7 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap"
           rel="stylesheet"
         />
       </head>
