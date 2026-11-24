@@ -138,6 +138,10 @@ export default function WaitlistForm() {
   return (
     <>
       <form className="waitlist" onSubmit={handleSubmit} noValidate>
+        <p className="waitlist-intro">
+          L’appli ouvre bientôt. Laisse ton e-mail, on te prévient en premier.
+          <strong>Un cadeau t’attend à l’ouverture. 🎁</strong>
+        </p>
         <label className="sr-only" htmlFor="email">
           Votre adresse email
         </label>
@@ -149,18 +153,21 @@ export default function WaitlistForm() {
             type="email"
             autoComplete="email"
             inputMode="email"
-            placeholder="ton@email.com"
+            placeholder="Ton e-mail"
             required
             maxLength={254}
           />
           <button type="submit" disabled={loading}>
-            {loading ? "Envoi..." : "Créer mon compte"}
+            {loading ? "Envoi..." : "Préviens-moi →"}
           </button>
         </div>
 
         <label className="form-optin" htmlFor="wantsSurvey">
-          <input id="wantsSurvey" name="wantsSurvey" type="checkbox" defaultChecked />
-          <span>Oui, vous pouvez m’envoyer un questionnaire plus tard.</span>
+          <input id="wantsSurvey" name="wantsSurvey" type="checkbox" />
+          <span>
+            Dis-nous ce que tu veux vraiment, on le crée pour toi. (Facultatif ·
+            formulaire rapide)
+          </span>
         </label>
 
         <div className="hp-field" aria-hidden="true">
