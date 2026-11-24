@@ -149,7 +149,7 @@ Il y a plusieurs couches :
 
 ### Mise en place
 
-1. Supabase > **SQL Editor** : exécute `supabase/migrations/20261124000000_survey.sql`, puis `20261124000100_drop_waitlist.sql` (supprime l'ancienne table `waitlist`, remplacée par `launch_contacts`). Les scripts sont relançables.
+1. Supabase > **SQL Editor** : exécute `supabase/migrations/20261124000000_survey.sql`, puis `20261125000000_survey_email.sql` (colonne `email` unique dans `survey_responses`). Ancienne table `waitlist` : `drop table if exists public.waitlist;`. Les scripts sont relançables.
 2. Variables Netlify obligatoires : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`.
 3. Redéploie : `NEXT_PUBLIC_*` est intégré au build.
 
@@ -158,11 +158,13 @@ Il y a plusieurs couches :
 ```text
 /questionnaire (6 étapes) → POST /api/survey → validation serveur (lib/survey.js)
   → honeypot + challenge HMAC (≥ 20 s) + Turnstile + 3 envois/h/IP en mémoire
-  → insert launch_contacts (si e-mail + consentement) puis insert survey_responses
+  → contrôle e-mail (jetables, fautes, DNS) → insert launch_contacts (si e-mail + consentement)
+  → survey_responses : upsert sur l'e-mail (un seul avis par e-mail, mis à jour s'il renvoie), insert si pas d'e-mail
 ```
 
-- **Tables** : `survey_responses` contient les réponses (tableaux PostgreSQL pour les choix multiples, CHECK sur chaque valeur). `launch_contacts` contient l'e-mail et le consentement, et reçoit aussi les inscriptions du formulaire d'accueil (une seule table d'e-mails). Il n'y a **aucune clé commune** entre les deux.
-- **Séparation des données** : `launch_contacts.created_at` est tronqué au jour pour empêcher un rapprochement par l'horodatage. C'est une **séparation des données, pas un anonymat absolu** : avec très peu de réponses par jour, ou si une personne décrit qui elle est dans une réponse libre, elle peut rester identifiable.
+- **Tables** : `survey_responses` contient les réponses (tableaux PostgreSQL pour les choix multiples, CHECK sur chaque valeur). `launch_contacts` contient l'e-mail et le consentement, et reçoit aussi les inscriptions du formulaire d'accueil (une seule table d'e-mails). `survey_responses.email` (facultatif, unique) indique qui a répondu ; sans e-mail, la réponse reste anonyme.
+- **Un avis par e-mail** : renvoyer le questionnaire avec le même e-mail met à jour la réponse (`updated_at`), sans que l'utilisateur le sache.
+- **Faux e-mails** : `lib/email-check.js` refuse les domaines jetables, les fautes courantes (`gmial.com`) et les domaines sans serveur mail (DNS). Seul un lien de confirmation par e-mail prouve qu'une adresse est réelle (non fait : demande un service d'envoi).
 - **Ce qui n'est jamais stocké** : l'IP, le User-Agent et le contenu des réponses dans les logs (seul le code d'erreur est loggé).
 - **RLS** : `anon` n'a aucun droit. `authenticated` peut lire **uniquement** si son `user_id` figure dans `public.admins`. Aucune écriture n'est possible hors service_role.
 - **Codes des choix** : ils sont définis dans `lib/survey.js` **et** dans les CHECK SQL. Toute modification doit être faite aux deux endroits.

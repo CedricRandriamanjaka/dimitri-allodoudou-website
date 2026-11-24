@@ -239,7 +239,7 @@ export default function SurveyForm() {
   const headId = `tf-q-${name}`;
   const hint =
     name === "email"
-      ? "Facultatif. Ton e-mail est enregistré à part, sans lien avec tes réponses."
+      ? "Facultatif. On te prévient à l'ouverture, et ton e-mail nous permet de mettre à jour tes réponses."
       : q.max
         ? `Choisis jusqu'à ${q.max} réponses · ${(value || []).length}/${q.max}`
         : q.hint;

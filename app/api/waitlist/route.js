@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { checkEmail } from "@/lib/email-check";
 import { EMAIL_RE } from "@/lib/survey";
 import { verifyChallenge } from "@/lib/waitlist-security";
 
@@ -85,6 +86,11 @@ export async function POST(request) {
         { error: "Adresse email invalide." },
         { status: 400 }
       );
+    }
+
+    const emailProblem = await checkEmail(email.trim().toLowerCase());
+    if (emailProblem) {
+      return NextResponse.json({ error: emailProblem }, { status: 400 });
     }
 
     const memoryLimit = checkMemoryRateLimit(hashIp(getClientIp(request)));

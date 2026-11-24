@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { verifyChallenge } from "@/lib/waitlist-security";
+import { checkEmail } from "@/lib/email-check";
 import { EMAIL_RE, validateSurvey } from "@/lib/survey";
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -63,6 +64,9 @@ export async function POST(request) {
       return fail("Réponses incomplètes ou invalides.", 400);
     }
 
+    const emailProblem = email && (await checkEmail(email));
+    if (emailProblem) return fail(emailProblem, 400);
+
     if (!(await verifyTurnstile(body.turnstileToken, TURNSTILE_SECRET_KEY))) {
       return fail("Vérification anti-spam échouée. Réessaie.", 403);
     }
@@ -83,7 +87,11 @@ export async function POST(request) {
       }
     }
 
-    const { error } = await supabase.from("survey_responses").insert(answers);
+    // Même e-mail : on met la réponse à jour, l'utilisateur voit le même « bien reçu »
+    const table = supabase.from("survey_responses");
+    const { error } = email
+      ? await table.upsert({ ...answers, email, updated_at: new Date().toISOString() }, { onConflict: "email" })
+      : await table.insert(answers);
     if (error) {
       // Seul le code est loggé : error.details peut contenir la ligne refusée
       console.error("survey_responses insert error:", error.code);
