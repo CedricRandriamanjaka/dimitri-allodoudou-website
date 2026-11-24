@@ -73,7 +73,6 @@ export default function WaitlistForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          source: "peemente-coming-soon",
           website,
           challenge,
         }),

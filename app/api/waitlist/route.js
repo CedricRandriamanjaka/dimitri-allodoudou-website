@@ -1,16 +1,14 @@
 import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import {
-  isAllowedOrigin,
-  verifyChallenge,
-} from "@/lib/waitlist-security";
+import { EMAIL_RE } from "@/lib/survey";
+import { isAllowedOrigin, verifyChallenge } from "@/lib/waitlist-security";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_INTERVAL_MS = 60_000;
 const MAX_PER_HOUR = 5;
 const HOUR_MS = 60 * 60 * 1000;
 
+// shortcut: limite en mémoire par instance serverless (IP hachée jamais stockée), passer à Upstash/Redis si spam réel
 /** @type {Map<string, number[]>} */
 const attemptBuckets = new Map();
 
@@ -55,43 +53,6 @@ function checkMemoryRateLimit(key) {
   return { ok: true };
 }
 
-async function checkDbRateLimit(supabase, ipHash) {
-  if (ipHash === "unknown") return { ok: true };
-
-  const since = new Date(Date.now() - HOUR_MS).toISOString();
-  const { data, error } = await supabase
-    .from("waitlist")
-    .select("created_at")
-    .eq("ip_hash", ipHash)
-    .gte("created_at", since)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Supabase rate-limit lookup error:", error);
-    return { ok: true };
-  }
-
-  if ((data?.length || 0) >= MAX_PER_HOUR) {
-    return {
-      ok: false,
-      error: "Limite atteinte : 5 envois par heure. Réessayez plus tard.",
-    };
-  }
-
-  if (data?.[0]) {
-    const elapsed = Date.now() - new Date(data[0].created_at).getTime();
-    if (elapsed < MIN_INTERVAL_MS) {
-      const waitSec = Math.ceil((MIN_INTERVAL_MS - elapsed) / 1000);
-      return {
-        ok: false,
-        error: `Attendez ${waitSec} s avant un nouvel essai.`,
-      };
-    }
-  }
-
-  return { ok: true };
-}
-
 export async function POST(request) {
   try {
     if (!isAllowedOrigin(request)) {
@@ -104,13 +65,7 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const {
-      email,
-      source = "peemente-coming-soon",
-      website = "",
-      challenge = "",
-      wantsSurvey = false,
-    } = body || {};
+    const { email, website = "", challenge = "" } = body || {};
 
     // Honeypot : bots qui remplissent les champs cachés
     if (website) {
@@ -136,10 +91,7 @@ export async function POST(request) {
       );
     }
 
-    const clientIp = getClientIp(request);
-    const ipHash = hashIp(clientIp);
-
-    const memoryLimit = checkMemoryRateLimit(ipHash);
+    const memoryLimit = checkMemoryRateLimit(hashIp(getClientIp(request)));
     if (!memoryLimit.ok) {
       return NextResponse.json({ error: memoryLimit.error }, { status: 429 });
     }
@@ -161,44 +113,10 @@ export async function POST(request) {
       },
     });
 
-    const dbLimit = await checkDbRateLimit(supabase, ipHash);
-    if (!dbLimit.ok) {
-      return NextResponse.json({ error: dbLimit.error }, { status: 429 });
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
-    const safeSource = String(source).slice(0, 80);
-    const surveyOptIn = Boolean(wantsSurvey);
-
-    const { data: existing, error: existingError } = await supabase
-      .from("waitlist")
-      .select("id, wants_survey")
-      .eq("email", normalizedEmail)
-      .maybeSingle();
-
-    if (existingError) {
-      console.error("Supabase waitlist lookup error:", existingError);
-      return NextResponse.json(
-        { error: "Impossible d’enregistrer votre email pour le moment." },
-        { status: 500 }
-      );
-    }
-
-    if (existing) {
-      if (surveyOptIn && !existing.wants_survey) {
-        await supabase
-          .from("waitlist")
-          .update({ wants_survey: true })
-          .eq("id", existing.id);
-      }
-      return NextResponse.json({ ok: true, alreadyRegistered: true });
-    }
-
-    const { error } = await supabase.from("waitlist").insert({
-      email: normalizedEmail,
-      source: safeSource,
-      ip_hash: ipHash === "unknown" ? null : ipHash,
-      wants_survey: surveyOptIn,
+    // « Préviens-moi » vaut consentement explicite : même table que le questionnaire
+    const { error } = await supabase.from("launch_contacts").insert({
+      email: email.trim().toLowerCase(),
+      notification_consent: true,
     });
 
     if (error) {
@@ -206,7 +124,7 @@ export async function POST(request) {
         return NextResponse.json({ ok: true, alreadyRegistered: true });
       }
 
-      console.error("Supabase waitlist insert error:", error);
+      console.error("launch_contacts insert error:", error.code);
       return NextResponse.json(
         { error: "Impossible d’enregistrer votre email pour le moment." },
         { status: 500 }
@@ -215,7 +133,7 @@ export async function POST(request) {
 
     return NextResponse.json({ ok: true, alreadyRegistered: false });
   } catch (error) {
-    console.error("Waitlist API error:", error);
+    console.error("Waitlist API error:", error?.name);
     return NextResponse.json(
       { error: "Erreur serveur." },
       { status: 500 }

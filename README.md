@@ -20,7 +20,7 @@ Landing page Allo Doudou pour **La Réunion**, avec capture d'email réelle, Sup
 
 1. Va sur https://supabase.com et crée un projet.
 2. Ouvre **SQL Editor**.
-3. Colle tout le contenu de `supabase.sql` et exécute-le.
+3. Exécute dans l'ordre les fichiers de `supabase/migrations/` (ils sont relançables).
 4. Va dans **Project Settings > API**.
 5. Récupère :
    - `Project URL`
@@ -54,7 +54,7 @@ http://localhost:3000
 
 Une fois Supabase configuré, entre un email dans le formulaire. Tu dois le voir apparaître dans :
 
-**Supabase > Table Editor > waitlist**
+**Supabase > Table Editor > launch_contacts**
 
 ## 3. Configurer l'anti-spam pour la production
 
@@ -132,7 +132,7 @@ Validation serveur
   ↓
 Supabase
   ↓
-public.waitlist
+public.launch_contacts
 ```
 
 La clé Supabase admin n'est jamais envoyée au navigateur.
@@ -152,10 +152,9 @@ Il y a plusieurs couches :
 
 ### Mise en place
 
-1. Supabase > **SQL Editor** : exécute `supabase/migrations/20261124000000_survey.sql`. Le script est relançable.
-2. Variables Netlify obligatoires : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`. Sans `TURNSTILE_SECRET_KEY`, l'API refuse tout envoi.
-3. Recommandé : `WAITLIST_CHALLENGE_SECRET`, une chaîne aléatoire longue. Sinon, la clé service_role sert aussi à signer le challenge.
-4. Redéploie : `NEXT_PUBLIC_*` est intégré au build.
+1. Supabase > **SQL Editor** : exécute `supabase/migrations/20261124000000_survey.sql`, puis `20261124000100_drop_waitlist.sql` (supprime l'ancienne table `waitlist`, remplacée par `launch_contacts`). Les scripts sont relançables.
+2. Variables Netlify obligatoires : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `NEXT_PUBLIC_SITE_URL` (adresse du site, sans elle l'API refuse les envois venant de Netlify).
+3. Redéploie : `NEXT_PUBLIC_*` est intégré au build.
 
 ### Fonctionnement
 
@@ -165,7 +164,7 @@ Il y a plusieurs couches :
   → insert launch_contacts (si e-mail + consentement) puis insert survey_responses
 ```
 
-- **Tables** : `survey_responses` contient les réponses (tableaux PostgreSQL pour les choix multiples, CHECK sur chaque valeur). `launch_contacts` contient l'e-mail et le consentement. Il n'y a **aucune clé commune** entre les deux.
+- **Tables** : `survey_responses` contient les réponses (tableaux PostgreSQL pour les choix multiples, CHECK sur chaque valeur). `launch_contacts` contient l'e-mail et le consentement, et reçoit aussi les inscriptions du formulaire d'accueil (une seule table d'e-mails). Il n'y a **aucune clé commune** entre les deux.
 - **Séparation des données** : `launch_contacts.created_at` est tronqué au jour pour empêcher un rapprochement par l'horodatage. C'est une **séparation des données, pas un anonymat absolu** : avec très peu de réponses par jour, ou si une personne décrit qui elle est dans une réponse libre, elle peut rester identifiable.
 - **Ce qui n'est jamais stocké** : l'IP, le User-Agent et le contenu des réponses dans les logs (seul le code d'erreur est loggé).
 - **RLS** : `anon` n'a aucun droit. `authenticated` peut lire **uniquement** si son `user_id` figure dans `public.admins`. Aucune écriture n'est possible hors service_role.
