@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { isAllowedOrigin, verifyChallenge } from "@/lib/waitlist-security";
+import { verifyChallenge } from "@/lib/waitlist-security";
 import { EMAIL_RE, validateSurvey } from "@/lib/survey";
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -39,7 +39,6 @@ async function verifyTurnstile(token, secret) {
 
 export async function POST(request) {
   try {
-    if (!isAllowedOrigin(request)) return fail("Origine non autorisée.", 403);
     if (Number(request.headers.get("content-length") || 0) > 20_000) {
       return fail("Requête invalide.", 413);
     }

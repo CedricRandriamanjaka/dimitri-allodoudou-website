@@ -77,7 +77,6 @@ Sur Netlify, tu utiliseras :
 ```env
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=TA_VRAIE_SITE_KEY
 TURNSTILE_SECRET_KEY=TA_VRAIE_SECRET_KEY
-TURNSTILE_ALLOWED_HOSTNAMES=peemente.netlify.app,www.tondomaine.re,tondomaine.re
 ```
 
 Ne mets pas les clés de test Cloudflare en production.
@@ -112,12 +111,11 @@ SUPABASE_URL=https://xxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=xxxx
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=xxxx
 TURNSTILE_SECRET_KEY=xxxx
-TURNSTILE_ALLOWED_HOSTNAMES=peemente.netlify.app
 ```
 
 Puis redéploie le site.
 
-Quand tu branches le vrai domaine, modifie aussi `NEXT_PUBLIC_SITE_URL` et `TURNSTILE_ALLOWED_HOSTNAMES`.
+`NEXT_PUBLIC_SITE_URL` sert au SEO (sitemap). L'API n'en a pas besoin.
 
 ## 5. Comment l'enregistrement fonctionne
 
@@ -146,14 +144,13 @@ Il y a plusieurs couches :
 3. **Timing** : un formulaire envoyé de manière absurdement rapide est refusé.
 4. **Validation serveur** : email, taille et token sont contrôlés côté API.
 5. **Email unique** : un même email n'est pas ajouté plusieurs fois.
-6. **Hostname Turnstile** : en production, limite les tokens aux domaines autorisés.
 
 ## 7. Questionnaire `/questionnaire`
 
 ### Mise en place
 
 1. Supabase > **SQL Editor** : exécute `supabase/migrations/20261124000000_survey.sql`, puis `20261124000100_drop_waitlist.sql` (supprime l'ancienne table `waitlist`, remplacée par `launch_contacts`). Les scripts sont relançables.
-2. Variables Netlify obligatoires : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `NEXT_PUBLIC_SITE_URL` (adresse du site, sans elle l'API refuse les envois venant de Netlify).
+2. Variables Netlify obligatoires : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`.
 3. Redéploie : `NEXT_PUBLIC_*` est intégré au build.
 
 ### Fonctionnement

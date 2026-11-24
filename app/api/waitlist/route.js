@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { EMAIL_RE } from "@/lib/survey";
-import { isAllowedOrigin, verifyChallenge } from "@/lib/waitlist-security";
+import { verifyChallenge } from "@/lib/waitlist-security";
 
 const MIN_INTERVAL_MS = 60_000;
 const MAX_PER_HOUR = 5;
@@ -55,10 +55,6 @@ function checkMemoryRateLimit(key) {
 
 export async function POST(request) {
   try {
-    if (!isAllowedOrigin(request)) {
-      return NextResponse.json({ error: "Origine non autorisée." }, { status: 403 });
-    }
-
     const contentLength = Number(request.headers.get("content-length") || 0);
     if (contentLength > 20_000) {
       return NextResponse.json({ error: "Requête invalide." }, { status: 413 });
