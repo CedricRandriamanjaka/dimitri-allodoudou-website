@@ -65,24 +65,10 @@ export default function HomePage() {
             </div>
 
             <div className="hero-visual anim-in" style={{ "--d": "250ms" }}>
-              <div className="slider">
-                <div className="track">
-                  <div className="slide">
-                    <img
-                      src="/phone.jpg"
-                      alt="Aperçu flouté de l’application Peemente, bientôt à La Réunion"
-                    />
-                  </div>
-                  <div className="slide collage" aria-hidden="true">
-                    <img className="shot shot-a" src="/photos/p1.jpg" alt="" />
-                    <img className="shot shot-b" src="/photos/p2.jpg" alt="" />
-                    <img className="shot shot-c" src="/photos/moment.jpg" alt="" />
-                  </div>
-                  <div className="slide" aria-hidden="true">
-                    <img src="/phone.jpg" alt="" />
-                  </div>
-                </div>
-              </div>
+              <img
+                src="/phone.jpg"
+                alt="Aperçu flouté de l’application Peemente, bientôt à La Réunion"
+              />
             </div>
           </section>
         </main>
