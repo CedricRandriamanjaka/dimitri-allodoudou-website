@@ -122,6 +122,19 @@ export default function WaitlistForm() {
               aria-labelledby="waitlist-modal-title"
               onClick={(event) => event.stopPropagation()}
             >
+              <button
+                type="button"
+                className="modal-x"
+                aria-label="Fermer"
+                onClick={() => setModal(null)}
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+                </svg>
+              </button>
+              <div className="modal-icon" aria-hidden="true">
+                {modal.type === "success" ? "✓" : "!"}
+              </div>
               <h2 id="waitlist-modal-title">{modal.title}</h2>
               <p>{modal.message}</p>
               {modal.type === "success" && (
@@ -133,9 +146,6 @@ export default function WaitlistForm() {
                   </a>
                 </div>
               )}
-              <button type="button" onClick={() => setModal(null)}>
-                Fermer
-              </button>
             </div>
           </div>,
           document.body
