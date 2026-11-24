@@ -46,8 +46,6 @@ export default function WaitlistForm() {
     const formData = new FormData(form);
     const email = formData.get("email")?.toString().trim();
     const website = formData.get("website")?.toString() || "";
-    const wantsSurvey = formData.get("wantsSurvey") === "on";
-
     if (!email) {
       setModal({
         type: "error",
@@ -78,7 +76,6 @@ export default function WaitlistForm() {
           source: "peemente-coming-soon",
           website,
           challenge,
-          wantsSurvey,
         }),
       });
 
@@ -87,14 +84,16 @@ export default function WaitlistForm() {
         throw new Error(data?.error || "Une erreur est survenue.");
       }
 
+      try {
+        localStorage.setItem("peemente-email", email);
+      } catch {}
+
       setModal({
         type: "success",
         title: data?.alreadyRegistered ? "Déjà inscrit" : "C’est noté",
         message: data?.alreadyRegistered
           ? "Cet email est déjà inscrit. On ne t’oublie pas."
-          : wantsSurvey
-            ? "On te prévient au lancement et on pourra t’envoyer le questionnaire."
-            : "Tu seras prévenu·e dès le lancement.",
+          : "Tu seras prévenu·e dès le lancement.",
       });
       form.reset();
     } catch (error) {
@@ -162,14 +161,6 @@ export default function WaitlistForm() {
           </button>
         </div>
 
-        <label className="form-optin" htmlFor="wantsSurvey">
-          <input id="wantsSurvey" name="wantsSurvey" type="checkbox" />
-          <span>
-            Dis-nous ce que tu veux vraiment, on le crée pour toi. (Facultatif ·
-            formulaire rapide)
-          </span>
-        </label>
-
         <div className="hp-field" aria-hidden="true">
           <label htmlFor="website">Votre site web</label>
           <input
@@ -181,6 +172,16 @@ export default function WaitlistForm() {
           />
         </div>
       </form>
+
+      <div className="survey-cta">
+        <p>
+          <strong>Dis-nous ce que tu veux vraiment, on le crée pour toi.</strong>
+          <span>Facultatif · formulaire rapide · 3 minutes</span>
+        </p>
+        <a className="survey-btn" href="/questionnaire">
+          C&apos;est parti !
+        </a>
+      </div>
 
       {modalNode}
     </>

@@ -148,7 +148,64 @@ Il y a plusieurs couches :
 5. **Email unique** : un même email n'est pas ajouté plusieurs fois.
 6. **Hostname Turnstile** : en production, limite les tokens aux domaines autorisés.
 
-## 7. SEO après le vrai domaine
+## 7. Questionnaire `/questionnaire`
+
+### Mise en place
+
+1. Supabase > **SQL Editor** : exécute `supabase/migrations/20261124000000_survey.sql`. Le script est relançable.
+2. Variables Netlify obligatoires : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`. Sans `TURNSTILE_SECRET_KEY`, l'API refuse tout envoi.
+3. Recommandé : `WAITLIST_CHALLENGE_SECRET`, une chaîne aléatoire longue. Sinon, la clé service_role sert aussi à signer le challenge.
+4. Redéploie : `NEXT_PUBLIC_*` est intégré au build.
+
+### Fonctionnement
+
+```text
+/questionnaire (6 étapes) → POST /api/survey → validation serveur (lib/survey.js)
+  → honeypot + challenge HMAC (≥ 20 s) + Turnstile + 3 envois/h/IP en mémoire
+  → insert launch_contacts (si e-mail + consentement) puis insert survey_responses
+```
+
+- **Tables** : `survey_responses` contient les réponses (tableaux PostgreSQL pour les choix multiples, CHECK sur chaque valeur). `launch_contacts` contient l'e-mail et le consentement. Il n'y a **aucune clé commune** entre les deux.
+- **Séparation des données** : `launch_contacts.created_at` est tronqué au jour pour empêcher un rapprochement par l'horodatage. C'est une **séparation des données, pas un anonymat absolu** : avec très peu de réponses par jour, ou si une personne décrit qui elle est dans une réponse libre, elle peut rester identifiable.
+- **Ce qui n'est jamais stocké** : l'IP, le User-Agent et le contenu des réponses dans les logs (seul le code d'erreur est loggé).
+- **RLS** : `anon` n'a aucun droit. `authenticated` peut lire **uniquement** si son `user_id` figure dans `public.admins`. Aucune écriture n'est possible hors service_role.
+- **Codes des choix** : ils sont définis dans `lib/survey.js` **et** dans les CHECK SQL. Toute modification doit être faite aux deux endroits.
+
+### Statistiques (SQL Editor ou futur `/admin`)
+
+| Vue | Usage |
+|---|---|
+| `survey_overview` | total des réponses, contacts ayant consenti |
+| `survey_daily` | réponses par jour (heure de La Réunion) |
+| `survey_answers` | une ligne par réponse choisie, avec `created_at`, `age_range` et `sector` pour filtrer |
+
+```sql
+-- Classement (top_problems, desired_features, meeting_methods, age_range, sector, gender_identity, experience, monthly_budget)
+select answer, count(*) from survey_answers where question = 'desired_features' group by 1 order by 2 desc;
+-- Par semaine / mois
+select date_trunc('week', day) as semaine, sum(responses) from survey_daily group by 1 order by 1;
+-- Filtre période + âge
+select answer, count(*) from survey_answers
+where question = 'top_problems' and age_range = '30-34' and created_at >= now() - interval '30 days'
+group by 1 order by 2 desc;
+```
+
+Les réponses libres (`libertinage_meaning`, `main_frustration`, `ideal_platform`) se lisent directement dans `survey_responses`.
+
+### Futur `/admin`
+
+1. Crée l'utilisateur dans Supabase > Authentication.
+2. Exécute `insert into public.admins (user_id) values ('<uuid>');`.
+3. Côté front, connecte-toi avec la clé **anon** et Supabase Auth, puis lis les vues : la RLS ne renvoie des lignes qu'aux admins.
+
+### Forfait Supabase Free : limites et sauvegardes
+
+- Base limitée à 500 Mo : une réponse pèse environ 1 à 3 Ko, ce qui laisse de la place pour des centaines de milliers de réponses.
+- Le projet est **mis en pause après 7 jours sans activité** : il faut le réactiver depuis le dashboard.
+- **Il n'y a pas de sauvegarde téléchargeable sur le forfait Free.** Exporte régulièrement les données : Table Editor > `survey_responses` / `launch_contacts` > **Export to CSV**, ou `pg_dump` avec la chaîne de connexion.
+- Il n'y a ni Storage, ni Realtime, ni polling : la consommation est minimale.
+
+## 8. SEO après le vrai domaine
 
 Après connexion du domaine :
 
