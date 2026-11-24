@@ -412,6 +412,22 @@ footer p { margin: 0; }
   line-height: 1.55;
 }
 
+.modal-cta {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  margin: 0 0 18px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #fff4ec;
+  border: 1px solid #ffb28a;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.modal-cta span { color: var(--muted); font-size: 13px; }
+.modal-cta .survey-btn { margin-top: 8px; }
+
 .waitlist-modal button {
   border: 0;
   border-radius: 999px;

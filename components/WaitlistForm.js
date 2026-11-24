@@ -124,6 +124,15 @@ export default function WaitlistForm() {
             >
               <h2 id="waitlist-modal-title">{modal.title}</h2>
               <p>{modal.message}</p>
+              {modal.type === "success" && (
+                <div className="modal-cta">
+                  <strong>Dis-nous ce que tu veux vraiment, on le crée pour toi.</strong>
+                  <span>Facultatif · formulaire rapide · 3 minutes</span>
+                  <a className="survey-btn" href="/questionnaire">
+                    C&apos;est parti !
+                  </a>
+                </div>
+              )}
               <button type="button" onClick={() => setModal(null)}>
                 Fermer
               </button>
