@@ -143,8 +143,8 @@ export default function SurveyForm() {
     if (loading) return;
 
     const mail = email.trim();
-    if (mail && !EMAIL_RE.test(mail)) return setError("Adresse e-mail invalide.");
-    if (mail && !consent) return setError("Coche la case pour être prévenu·e à l'ouverture.");
+    if (!EMAIL_RE.test(mail)) return setError("Entre une adresse e-mail valide.");
+    if (!consent) return setError("Coche la case pour être prévenu·e à l'ouverture.");
     if (SITE_KEY && !token) return setError("Vérification anti-spam en cours, patiente un instant.");
 
     const website = new FormData(event.currentTarget).get("website") || "";
@@ -239,7 +239,7 @@ export default function SurveyForm() {
   const headId = `tf-q-${name}`;
   const hint =
     name === "email"
-      ? "Facultatif. On te prévient à l'ouverture, et ton e-mail nous permet de mettre à jour tes réponses."
+      ? null
       : q.max
         ? `Choisis jusqu'à ${q.max} réponses · ${(value || []).length}/${q.max}`
         : q.hint;
@@ -257,7 +257,7 @@ export default function SurveyForm() {
             {index + 1} <Icon d={ARROW} size={14} />
           </span>
           <div>
-            <h2 id={headId}>{q ? q.label : "Laisse ton e-mail pour être prévenu·e à l'ouverture"}</h2>
+            <h2 id={headId}>{q ? q.label : "On te prévient à l'ouverture ?"}</h2>
             {hint && <p className="tf-hint">{hint}</p>}
           </div>
         </div>
@@ -265,6 +265,7 @@ export default function SurveyForm() {
         <div className="tf-body">
           {name === "email" ? (
             <>
+              <p className="tf-gift">🎁 Un cadeau t&apos;attend à l&apos;ouverture.</p>
               <input
                 className="tf-text"
                 type="email"
@@ -280,13 +281,10 @@ export default function SurveyForm() {
                 }}
                 autoFocus
               />
-              <p className="tf-gift">🎁 Un cadeau t&apos;attend à l&apos;ouverture.</p>
-              {email.trim() && (
-                <label className="tf-consent">
-                  <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-                  <span>J&apos;accepte d&apos;être prévenu·e par e-mail à l&apos;ouverture de Peemente.</span>
-                </label>
-              )}
+              <label className="tf-consent">
+                <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+                <span>J&apos;accepte d&apos;être prévenu·e à l&apos;ouverture.</span>
+              </label>
               <div ref={widgetRef} />
               <div className="hp-field" aria-hidden="true">
                 <label htmlFor="tf-website">Votre site web</label>
@@ -355,16 +353,16 @@ export default function SurveyForm() {
           )}
 
           <div className="tf-actions">
-            {index === LAST ? (
-              <button type="submit" className="tf-ok" disabled={loading}>
-                {loading ? "Envoi…" : "J'envoie mes réponses"} <Icon d={ARROW} size={18} />
-              </button>
-            ) : (
+            {index !== LAST ? (
               <button type="button" className="tf-ok" onClick={next}>
                 OK <Icon d={CHECK} size={18} />
               </button>
+            ) : (
+              <button type="submit" className="tf-ok" disabled={loading}>
+                {loading ? "Envoi…" : "Envoyer et être prévenu·e"} <Icon d={ARROW} size={18} />
+              </button>
             )}
-            {enterHint}
+            {index !== LAST && enterHint}
           </div>
         </div>
       </div>

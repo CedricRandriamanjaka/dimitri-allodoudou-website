@@ -191,16 +191,6 @@ export default function WaitlistForm() {
         </div>
       </form>
 
-      <div className="survey-cta">
-        <p>
-          <strong>Dis-nous ce que tu veux vraiment, on le crée pour toi.</strong>
-          <span>Facultatif · formulaire rapide · 3 minutes</span>
-        </p>
-        <a className="survey-btn" href="/questionnaire">
-          C&apos;est parti !
-        </a>
-      </div>
-
       {modalNode}
     </>
   );

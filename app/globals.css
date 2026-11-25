@@ -528,6 +528,7 @@ footer p { margin: 0; }
   transition: background .15s ease, border-color .15s ease, transform .15s ease;
 }
 
+button.tf-choice { width: 100%; font: inherit; color: inherit; text-align: left; }
 .tf-choice:hover { background: #fff; border-color: var(--primary); }
 .tf-choice:active { transform: scale(.99); }
 
