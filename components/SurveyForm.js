@@ -225,6 +225,26 @@ export default function SurveyForm() {
           </span>
           <h1>Merci, c&apos;est noté.</h1>
           <p className="tf-lead">Tes réponses vont vraiment compter. On te prévient dès l&apos;ouverture.</p>
+          <div className="tf-social">
+            <p>En attendant, rejoins la communauté 👇</p>
+            <a className="tf-ok" href="https://www.instagram.com/peemente.re/" target="_blank" rel="noopener noreferrer">
+              Suivre @peemente.re
+            </a>
+            <div className="tf-social-icons">
+              <a href="https://www.instagram.com/peemente.re/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <rect x="3" y="3" width="18" height="18" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor" />
+                </svg>
+              </a>
+              <a href="https://www.facebook.com/peemente.re" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M14 8h2.5V4.5H14a3.5 3.5 0 0 0-3.5 3.5V10H8v3.5h2.5V21H14v-7.5h2.5L17 10h-3V8.3c0-.2.1-.3.3-.3z" />
+                </svg>
+              </a>
+            </div>
+          </div>
           <a className="tf-ok" href="/">
             Retour à l&apos;accueil
           </a>

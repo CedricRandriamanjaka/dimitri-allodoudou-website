@@ -529,6 +529,20 @@ footer p { margin: 0; }
 }
 
 button.tf-choice { width: 100%; font: inherit; color: inherit; text-align: left; }
+
+.tf-social { display: grid; gap: 14px; justify-items: center; margin-top: 28px; }
+.tf-social p { margin: 0; font-size: 16px; }
+.tf-social-icons { display: flex; gap: 12px; }
+.tf-social-icons a {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #ffb28a;
+  color: var(--text);
+}
 .tf-choice:hover { background: #fff; border-color: var(--primary); }
 .tf-choice:active { transform: scale(.99); }
 
